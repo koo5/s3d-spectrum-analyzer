@@ -13,10 +13,16 @@ static void freq(gint16 data[2][256])
      }
 }
 
-VisPlugin example2_vp =
-{
-	.description = "Autotools example 2",
+
+
+VisPlugin fsanalyzer_vp = {
+	.description = "cat freq > /tmp/somefunnyname",
 	.num_pcm_chs_wanted = 0,
 	.num_freq_chs_wanted = 1,
-	.render_freq = freq
+	.render_freq = freq  /* render_freq */
 };
+
+VisPlugin *spectrum_vplist[] = { &fsanalyzer_vp, NULL };
+
+DECLARE_PLUGIN(funnyname, NULL, NULL, NULL, NULL, NULL, NULL, spectrum_vplist,NULL);
+
