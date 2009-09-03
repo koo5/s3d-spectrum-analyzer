@@ -26,17 +26,14 @@
 #include "stdio.h"
 #include <math.h>
 
-int modE=1;
 #define NUM_BANDS 16
 float width = 0.1;
-
-float mats[16*16*3*12];
+int modE=1;
+float mats[16*16*12];
 float *mp;
-float vectors[16*16*4*3];
-float base[16*16*4*3];
+float vectors[16*16*3];
 float *vp;
-float *bp;
-int polys[16*16*6*2*4];
+int polys[15*15*1*2*4];
 
 int o=-1;
 
@@ -91,9 +88,6 @@ static void gen_mats(void)
 			green= x * (1.0 / 15);
 			blue= b_base;
 			glColor3f(red,green,blue);
-			glColor3f(0.5 * red, 0.5 * green, 0.5 * blue);
-			glColor3f(0.25 * red, 0.25 * green, 0.25 * blue);
-
 		}
 	}
 }
@@ -107,32 +101,12 @@ void drVertex3f(float x, float y, float z)
     *vp=z*9;
     vp++;
 }
-void baVertex3f(float x, float y, float z)
-{
-    *bp=x*9;
-    bp++;
-    *bp=y*9-7;
-    bp++;
-    *bp=z*9;
-    bp++;
-}
-
+ 
 static float heights[16][16], scale;
 
 static void vert_bar(float x_offset, float z_offset, float y_offset)
 {
 	drVertex3f(x_offset, y_offset, z_offset);
-	drVertex3f(x_offset+width, y_offset, z_offset);
-	drVertex3f(x_offset+width, y_offset, z_offset+width);
-	drVertex3f(x_offset, y_offset, z_offset+width);
-}
-
-static void vert_barbase(float x_offset, float z_offset, float y_offset)
-{
-	baVertex3f(x_offset, 0, z_offset);
-	baVertex3f(x_offset+width, 0, z_offset);
-	baVertex3f(x_offset+width, 0, z_offset+width);
-	baVertex3f(x_offset, 0, z_offset+width);
 }
 
 void makepolys(void)
@@ -140,134 +114,26 @@ void makepolys(void)
     int * pp;
     pp=polys;
     int i,j,c;
-#define nob 16*16*4
-    switch (modE)
+    for(i=0;i<15;i++)
+    for(j=0;j<15;j++)
     {
-    case 1:
-    case 2:
-    case 4:
-    for(i=0;i<16*16;i++)
-    {
-	    j=i*4;
-	    c=i*3;
-/*top*/
-	    *pp=nob+j+0;pp++;
-	    *pp=nob+j+1;pp++;
-	    *pp=nob+j+2;pp++;
-	    *pp=c;pp++;
-	    *pp=nob+j+0;pp++;
-	    *pp=nob+j+2;pp++;
-	    *pp=nob+j+3;pp++;
-	    *pp=c;pp++;
-/*bottom*/
-	    *pp=j+2;pp++;
-	    *pp=j+1;pp++;
-	    *pp=j+0;pp++;
-	    *pp=c;pp++;
-	    *pp=j+2;pp++;
-	    *pp=j+0;pp++;
-	    *pp=j+3;pp++;
-	    *pp=c;pp++;
+	if(modE)
+		c=i*16+j;
+	else
+		c=i+j;
+	
+		*pp=i+j*16;pp++;
+		*pp=i+1+j*16+16;pp++;
 
-	    *pp=j+0;pp++;
-	    *pp=j+1;pp++;
-	    *pp=nob+j+1;pp++;
-	    *pp=c;pp++;
-	    *pp=j+0;pp++;
-	    *pp=nob+j+1;pp++;
-	    *pp=nob+j+0;pp++;
-	    *pp=c;pp++;
+		*pp=i+1+j*16;pp++;
 
-	    *pp=j+1;pp++;
-	    *pp=j+2;pp++;
-	    *pp=nob+j+2;pp++;
-	    *pp=c;pp++;
-	    *pp=j+1;pp++;
-	    *pp=nob+j+2;pp++;
-	    *pp=nob+j+1;pp++;
-	    *pp=c;pp++;
+		*pp=c;pp++;
+		*pp=i+j*16;pp++;
+		*pp=i+j*16+16;pp++;
 
-	    *pp=j+2;pp++;
-	    *pp=j+3;pp++;
-	    *pp=nob+j+3;pp++;
-	    *pp=c;pp++;
-	    *pp=j+2;pp++;
-	    *pp=nob+j+3;pp++;
-	    *pp=nob+j+2;pp++;
-	    *pp=c;pp++;
+		*pp=i+1+j*16+16;pp++;
 
-	    *pp=j+3;pp++;
-	    *pp=j+0;pp++;
-	    *pp=nob+j+0;pp++;
-	    *pp=c;pp++;
-	    *pp=j+3;pp++;
-	    *pp=nob+j+0;pp++;
-	    *pp=nob+j+3;pp++;
-	    *pp=c;pp++;
-    }
-    break;
-    case 3:
-    case 5:
-    for(i=0;i<16*16;i++)
-    {
-	    j=i*8;
-	    c=i*3;
-/*top*/
-	    *pp=j+4;pp++;
-	    *pp=j+5;pp++;
-	    *pp=j+6;pp++;
-	    *pp=c;pp++;
-	    *pp=j+4;pp++;
-	    *pp=j+6;pp++;
-	    *pp=j+7;pp++;
-	    *pp=c;pp++;
-/*bottom*/
-	    *pp=j+2;pp++;
-	    *pp=j+1;pp++;
-	    *pp=j+0;pp++;
-	    *pp=c;pp++;
-	    *pp=j+2;pp++;
-	    *pp=j+0;pp++;
-	    *pp=j+3;pp++;
-	    *pp=c;pp++;
-
-	    *pp=j+0;pp++;
-	    *pp=j+1;pp++;
-	    *pp=j+5;pp++;
-	    *pp=c;pp++;
-	    *pp=j+0;pp++;
-	    *pp=j+5;pp++;
-	    *pp=j+4;pp++;
-	    *pp=c;pp++;
-
-	    *pp=j+1;pp++;
-	    *pp=j+2;pp++;
-	    *pp=j+6;pp++;
-	    *pp=c;pp++;
-	    *pp=j+1;pp++;
-	    *pp=j+6;pp++;
-	    *pp=j+5;pp++;
-	    *pp=c;pp++;
-
-	    *pp=j+2;pp++;
-	    *pp=j+3;pp++;
-	    *pp=j+7;pp++;
-	    *pp=c;pp++;
-	    *pp=j+2;pp++;
-	    *pp=j+7;pp++;
-	    *pp=j+6;pp++;
-	    *pp=c;pp++;
-
-	    *pp=j+3;pp++;
-	    *pp=j+0;pp++;
-	    *pp=j+4;pp++;
-	    *pp=c;pp++;
-	    *pp=j+3;pp++;
-	    *pp=j+4;pp++;
-	    *pp=j+7;pp++;
-	    *pp=c;pp++;
-    }
-    break;
+		*pp=c;pp++;
     }
 }
 
@@ -286,7 +152,7 @@ void bars(void (*baf)(float,float,float))
 		{
 			x_offset = -1.6 + (x * 0.2);
 
-			baf(x_offset, z_offset, heights[y][x]);
+			baf(x_offset, z_offset, (-1+2*modE)*heights[y][x]);
 		}
 	}
 }
@@ -302,16 +168,12 @@ static void draw_bars(void)
 	    s3d_flags_on(o, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
 	    makepolys();
 	    gen_mats();
-	    s3d_push_polygons(o, polys, 16*16*12);
-	    s3d_push_materials_a(o,mats,3*16*16);
-	    bp=base;
-	    bars(vert_barbase);
-	    s3d_push_vertices(o,base,4*16*16);
-	    
-	    s3d_push_vertices(o,vectors,4*16*16);
+	    s3d_push_polygons(o, polys, 15*15*2);
+	    s3d_push_materials_a(o,mats,16*16);
+	    s3d_push_vertices(o,vectors,16*16);
 	}
 	else
-	    s3d_pep_vertices(o,vectors,4*16*16);
+	    s3d_pep_vertices(o,vectors,16*16);
 }
 
 static void oglspectrum_gen_heights(gint16 data[2][256])
@@ -356,41 +218,39 @@ static void oglspectrum_gen_heights(gint16 data[2][256])
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int key(struct s3d_evt *e)
 {
 modE++;
-if (modE>5)modE=1;
+if (modE>1)modE=0;
 makepolys();
-if(modE==3)
-width=0.111;
-else
-width = modE/10.0;
-s3d_pop_polygon(o, 16*16*12);
-s3d_push_polygons(o, polys, 16*16*12);
+s3d_pop_polygon(o, 15*15*2);
+s3d_push_polygons(o, polys, 15*15*2);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void mainloop(void)
